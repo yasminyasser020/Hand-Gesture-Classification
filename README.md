@@ -1,47 +1,75 @@
-# Hand Gesture Classification
+#  Hand Gesture Classification with MLflow Tracking
 
-##  Project Overview
+## Project Overview
+
 This project focuses on the classification of hand gestures using landmark data from the **HaGRID** (Hand Gesture Recognition Image Dataset). By utilizing **MediaPipe**, 21 distinct hand landmarks (representing $x, y, z$ coordinates) were extracted to serve as the feature set for training supervised machine learning models.
 
-The goal was to develop a reproducible pipeline for data preprocessing, model tuning, and evaluation to identify the most accurate system for recognizing 18 different gesture classes.
 
-##  Technical Process
-The project followed a structured machine learning lifecycle to ensure a reliable classification system:
 
-* **Data Loading:** Successfully imported the landmark coordinates and gesture labels from the CSV dataset.
-* **Data Visualization:** Performed exploratory analysis by plotting keypoint samples to verify hand geometry and data quality.
-* **Data Preprocessing:** Cleaned and prepared the data by handling missing values, normalizing coordinates, and splitting the dataset into training, validation and testing sets.
-* **Model Training:** Implemented and benchmarked three algorithms: **Support Vector Machine (SVM)**, **Random Forest**, and **K-Nearest Neighbors (KNN)**.
-* **Evaluation:** Conducted a detailed performance analysis using **Accuracy, Precision, Recall,** and **F1-Score**.
-* **Conclusion:** Summarized results to select the best-performing model for final deployment
-##  Performance Results
-The evaluation was based on Accuracy, Recall, and F1-Score. The **SVM** model achieved the highest performance across all metrics.
+The goal was to develop a reproducible pipeline—fully integrated with **MLflow**—for data preprocessing, model tuning, and evaluation. This experiment tracking system was used to systematically log hyperparameters, performance metrics, and model artifacts to identify the most accurate architecture for recognizing 18 different gesture classes.
 
-### Model Comparison Table
-| Model | Best Hyperparameters | Accuracy | Recall | F1-Score |
-| :--- | :--- | :--- | :--- | :--- |
-| **SVM** | Kernel=Poly, C=100.0, degree=2.0, Gamma=1.0 | **0.9723** | **0.9725** | **0.9722** |
-| **Random Forest** | Trees=200, Depth=30.0 | 0.9418 | 0.9422 | 0.9420 |
-| **KNN** | Neighbors=3 | 0.9034 | 0.9049 | 0.9046 |
+---
 
-### Final Conclusion
-The **SVM with a Polynomial Kernel** is the superior model for this dataset, achieving an F1-Score of **97.22%**. It demonstrates high robustness in distinguishing between complex gesture classes with minimal error.
+##  The MLflow Experimentation Pipeline
+The project implements a **Manual Parameter Sweep** using nested loops to systematically evaluate dozens of configurations across three different model families.
 
-##  Error Analysis
-Confusion matrices were generated to visualize the classification performance for each model. These charts represent how accurately the models predicted the validation data.
+### 1. Model Search Space
+* **SVM:** Testing of `linear`, `rbf`, and `poly` kernels with various $C$ values, gamma values and polynomial degrees.
+* **Random Forest:** Evaluation of forest size (`n_estimators`) and maximum tree depth.
+* **KNN:** Benchmarking of neighbor counts ($k$) to find the optimal balance between bias and variance.
 
-### 1. SVM (Top Performing)
-The SVM shows a strong diagonal, indicating high precision for nearly all 18 gesture classes.
-![SVM Confusion Matrix](svm_confusion_matrix.png)
+### 2. Automated Logging
+For every training iteration, MLflow captures:
+* **Metrics:** Accuracy, Precision, Recall, and F1-Score.
+* **Artifacts:** A high-resolution **Confusion Matrix** image for visual error analysis.
+* **Signatures:** Inferred model schemas to ensure consistent input/output formatting during deployment.
 
-### 2. Random Forest
-![Random Forest Confusion Matrix](rf_confusion_matrix.png)
 
-### 3. K-Nearest Neighbors
-![KNN Confusion Matrix](knn_confusion_matrix.png)
+
+---
+
+##  Performance Leaderboard
+Below is the summary of the top-performing models:
+
+![MLflow Comparison Table](Comparing_best_three_models.PNG)
+
+| Model | Key Parameters | Accuracy | F1-Score | 
+| :--- | :--- | :--- | :--- |
+| **SVM** | `kernel=poly, C=100, degree=2` | **0.972** | **0.972** |
+| **Random Forest** | `n_estimators=200, max_depth=30` | 0.942 | 0.942 | 
+| **KNN** | `n_neighbors=3` | 0.903 | 0.905 |
+
+---
+
+##  Visual Analysis: Confusion Matrices
+MLflow logs a high-resolution Confusion Matrix for every individual run. Below is a comparison of the error distributions for the three evaluated model families.
+
+### Random Forest
+The Random Forest model ($n=200, D=30$) served as a robust competitor. While it accurately classifies 18 categories, the matrix below highlights specific challenges in distinguishing between gestures with similar finger extensions (e.g., `peace` vs. `two_up`).
+
+![Random Forest Confusion Matrix](RF__n_200_D_30_Confusion_Matrix.png)
+
+### K-Nearest Neighbors (KNN)
+The KNN model ($k=3$) exhibited higher prediction noise, specifically struggling to differentiate between gestures with similar landmark densities such as peace and two_up, peace_inverted and two_up_inverted and to distinguish between inverted and non-inverted gesture pairs.
+
+![KNN Confusion Matrix](KNN__n_3_Confusion_Matrix.png)
+
+##  Best Model (Registered): SVM Confusion Matrix
+The chart below highlights the performance of the champion **SVM** model. The strong diagonal trend confirms high precision across the 18 gesture classes.
+
+![SVM Confusion Matrix](SVM_poly_Confusion_Matrix.png)
+
+---
 
 ##  Dataset Information
 * **Source:** HaGRID (Hand Gesture Recognition Image Dataset)
 * **Input:** 21 Landmarks per hand (MediaPipe output).
 * **Classes:** 18 gesture categories :
-* call, dislike, fist, four, like, mute, ok, one, palm, peace, peace_inverted, rock, stop, stop_inverted, three, three2, two_up, two_up_inverted.
+ call, dislike, fist, four, like, mute, ok, one, palm, peace, peace_inverted, rock, stop, stop_inverted, three, three2, two_up, two_up_inverted.
+
+---
+
+##  Project Structure
+* **`Data Preprocessing.ipynb`** :The primary notebook containing the complete data preprocessing pipeline.
+* **`Training and Evaluation using mlflow.ipynb`**: The notebook that contains the manual parameter sweep loops used to evaluate various hyperparameter configurations.
+* **`train_with_mlflow.py`**: A dedicated helper script containing the `log_experiment_run` function for MLflow integration.
