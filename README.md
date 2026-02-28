@@ -61,6 +61,16 @@ The chart below highlights the performance of the champion **SVM** model. The st
 
 ---
 
+### SVM (Polynomial Kernel) was selected and registered
+The **SVM (kernel='poly', C=100, degree=2)** was selected for the following reasons:
+
+* **Superior Feature Mapping:** Hand gesture landmarks often exhibit non-linear relationships; the polynomial kernel effectively mapped the 63-dimensional feature space into a higher dimension to find clear decision boundaries.
+* **Resolving Class Ambiguity:** Unlike the other models, the SVM successfully differentiated between visually similar gestures like `peace`, `two_up` and `peace_inverted`.
+* **Highest Predictive Power:** It achieved the leading **Accuracy (0.972)** and **F1-Score (0.972)**
+* **Generalization:** By focusing on support vectors, the SVM avoided the "noise" sensitivity seen in the KNN, leading to the cleanest diagonal in the confusion matrix analysis.
+
+---
+
 ##  Dataset Information
 * **Source:** HaGRID (Hand Gesture Recognition Image Dataset)
 * **Input:** 21 Landmarks per hand (MediaPipe output).
