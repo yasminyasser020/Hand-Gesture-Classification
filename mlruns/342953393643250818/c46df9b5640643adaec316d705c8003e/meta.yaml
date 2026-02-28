@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/342953393643250818/c46df9b5640643adaec316d705c8003e/artifacts
+end_time: 1771901016454
+entry_point_name: ''
+experiment_id: '342953393643250818'
+lifecycle_stage: active
+run_id: c46df9b5640643adaec316d705c8003e
+run_name: SVM_rbf
+run_uuid: c46df9b5640643adaec316d705c8003e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1771900978074
+status: 3
+tags: []
+user_id: Dell
